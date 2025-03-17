@@ -3,6 +3,11 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/.env.*.local.php
+/.env.test
+/.env.dev
+/.env.prod
+/.env
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -23,3 +28,26 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> system files ###
+.DS_Store
+Thumbs.db
+###< system files ###
+
+###> logs ###
+/var/logs/
+/var/log/
+/logs/
+###< logs ###
+
+###> cache ###
+/var/cache/
+/cache/
+/tmp/
+###< cache ###
+
+###> IDE-specific ###
+.vscode/
+/.idea/
+/*.iml
+###< IDE-specific ###
