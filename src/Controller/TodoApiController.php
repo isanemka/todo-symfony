@@ -12,16 +12,14 @@ use Symfony\Component\Routing\Attribute\Route;
 // TodoApiController will handle API requests for the todos
 class TodoApiController extends AbstractController
 {
-    #[Route('/api/todos')]
+    #[Route('/api/todos', methods: ['GET'])]
     public function getCollection(EntityManagerInterface $entityManager): Response
     {
         // Fetch all todos from the database
         $todos = $entityManager->getRepository(ToDo::class)->findAll();
 
-        // Return the todos to the index template
-        return $this->render('/main/index.html.twig', [
-            'todos' => $todos,
-        ]);
+        // Return the todos as JSON with a status code
+        return $this->json($todos, Response::HTTP_OK);
     }
     // Create a new todo
     #[Route('/api/todos', methods: ['POST'])]
