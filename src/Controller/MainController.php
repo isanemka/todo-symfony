@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 // MainController will render the main page of the application
 class MainController extends AbstractController
 {
-    #[Route('/')]
+    #[Route('/', name: 'main')]
     public function index(): Response
     {
         return $this->render('main/index.html.twig', [
