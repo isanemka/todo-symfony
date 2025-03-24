@@ -56,7 +56,7 @@ class TodoApiController extends AbstractController
         // Return the corresponding todo as JSON
         return $this->json($todo);
     }
-    // Update a todo
+    // Update a todo completely
     #[Route('/api/todos/{id}', methods: ['PUT'])]
     public function updateItem(int $id, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -75,6 +75,38 @@ class TodoApiController extends AbstractController
         $todo->setTitle($data['title'] ?? $todo->getTitle());
         $todo->setDescription($data['description'] ?? $todo->getDescription());
         $todo->setCompleted($data['completed'] ?? $todo->getCompleted());
+
+        // Save the updated todo to the database
+        $entityManager->flush();
+
+        // Return the updated todo as JSON
+        return $this->json($todo);
+    }
+    // Update a todo partially
+    #[Route('/api/todos/{id}', methods: ['PATCH'])]
+    public function patchItem(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Find the todo in the database by its ID
+        $todo = $entityManager->getRepository(ToDo::class)->find($id);
+
+        // Return an error if the todo is not found
+        if (!$todo) {
+            return $this->json(['error' => 'Todo not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Get the JSON data from the request and decode it
+        $data = json_decode($request->getContent(), true);
+
+        // Update the todo entity with the new data
+        if (array_key_exists('title', $data)) {
+            $todo->setTitle($data['title']);
+        }
+        if (array_key_exists('description', $data)) {
+            $todo->setDescription($data['description']);
+        }
+        if (array_key_exists('completed', $data)) {
+            $todo->setCompleted($data['completed']);
+        }
 
         // Save the updated todo to the database
         $entityManager->flush();
