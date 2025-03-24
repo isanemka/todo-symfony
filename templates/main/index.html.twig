@@ -7,13 +7,38 @@
     <div>
         <h2>What you need ToDo:</h2>
         <ul>
-            {% for todo in todos %}
-                <li>
-                    <input type="checkbox" name="todo" value="{{ todo.completed }}" {% if todo.completed %}checked{% endif %}>
-                    {{ todo.title }} - {{ todo.description }}
-                </li>
-            {% endfor %}
+            
         </ul>
     </div>
+    <script>
+        // Fetch the list of todos from the API
+        fetch('/api/todos')
+            .then(response => response.json())
+            .then(todos => {
+                const list = document.querySelector('ul');
+
+                // Add each todo to the list
+                todos.forEach(todo => {
+                    const item = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+
+                    // If the todo is completed, check the checkbox
+                    if (todo.completed) {
+                        checkbox.checked = true;
+                    }
+
+                    // Append the checkbox, todo title and description to the list item
+                    item.appendChild(checkbox);
+                    item.append(` ${todo.title} - ${todo.description ?? ''}`);
+                    list.appendChild(item);
+                });
+                
+            })
+            // Catch any errors and log them to the console
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    </script>
 {% endblock %}
 
