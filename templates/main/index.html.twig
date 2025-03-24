@@ -12,6 +12,7 @@
     </div>
     <div>
         <button id="toggle-form">Add ToDo</button>
+        <button id="toggle-edit">Edit ToDos</button>
     </div>
     <div>
         <form id="create-todo" style="display: none;">
@@ -24,6 +25,20 @@
     </div>
 
     <script>
+        // Toggle the visibility of the edit buttons
+        let editMode = false;
+        const editButton = document.getElementById('toggle-edit');
+        editButton.addEventListener('click', function () {
+            document.querySelectorAll('.action-button').forEach(button => {
+                button.style.display = editMode ? 'none' : 'block';
+            });
+            editMode = !editMode;
+            if (editMode) {
+                editButton.innerText = 'Close Edit';
+            } else {
+                editButton.innerText = 'Edit ToDos';
+            }
+        });
         // Toggle the visibility of the form
         const button = document.getElementById('toggle-form');
         button.addEventListener('click', function () {
@@ -79,10 +94,12 @@
                 .then(response => response.json())
                 .then(todo => {
                     
-                    // Add the new todo to the list
+                    // Add the new todo to the list and reset the form
                     renderTodo(todo);
                     document.getElementById('title').value = '';
                     document.getElementById('description').value = '';
+
+                    // Notify the user that there are new todos
                     alert('You have new things to do!');
                 })
                 .catch(error => {
@@ -95,6 +112,33 @@
             const list = document.getElementById('read-todo');
             const item = document.createElement('li');
             const checkbox = document.createElement('input');
+            const deleteButton = document.createElement('button');
+            const editTodoButton = document.createElement('button');
+            editTodoButton.classList.add('action-button', 'edit-button');
+            editTodoButton.style.display = 'none';
+            editTodoButton.innerText = 'Edit';
+            deleteButton.classList.add('action-button', 'delete-button');
+            deleteButton.style.display = 'none';
+            deleteButton.innerText = 'Delete';
+            deleteButton.addEventListener('click', function () {
+                // Confirm the user wants to delete the todo
+                const confirmDelete = confirm('Are you sure you want to delete this todo?');
+                if (!confirmDelete) {
+                    return;
+                }
+                // Send a DELETE request to the API to delete the todo
+                fetch(`/api/todos/${todo.id}`, {
+                    method: 'DELETE',
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            list.removeChild(item);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
             checkbox.type = 'checkbox';
             checkbox.checked = todo.completed;
 
@@ -116,9 +160,11 @@
             });
 
             // Append the checkbox, todo title and description to the list item
-            item.appendChild(checkbox);
+            item.append(checkbox);
             item.append(` ${todo.title} - ${todo.description ?? ''}`);
-            list.appendChild(item);
+            item.append(editTodoButton);
+            item.append(deleteButton);
+            list.append(item);
         }
     </script>
 {% endblock %}
