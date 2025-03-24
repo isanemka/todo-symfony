@@ -8,3 +8,28 @@ ul {
     padding: 0;
     overflow: hidden;
 }
+
+li {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+
+.edit-button {
+    background-color: navy;
+    color: white;
+    border: none;
+    padding: 0.5em 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 0.5em 0.5em;
+    border-radius: 5px;
+    cursor: pointer;
+}
