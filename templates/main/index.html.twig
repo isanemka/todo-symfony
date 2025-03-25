@@ -115,6 +115,64 @@
             const deleteButton = document.createElement('button');
             const editTodoButton = document.createElement('button');
             editTodoButton.classList.add('action-button', 'edit-button');
+
+            let isEditing = false;
+            let titleInput;
+            let descriptionInput;
+
+            editTodoButton.addEventListener('click', function () {
+                if (!isEditing) {
+                    // Switch to edit mode
+                    titleInput = document.createElement('input');
+                    titleInput.type = 'text';
+                    titleInput.value = todo.title ?? '';
+
+                    descriptionInput = document.createElement('input');
+                    descriptionInput.type = 'text';
+                    descriptionInput.value = todo.description ?? '';
+
+                    item.replaceChild(titleInput, todoText);
+                    item.insertBefore(descriptionInput, editTodoButton);
+                    editTodoButton.innerText = 'Save';
+                    isEditing = true;
+                } else {
+                    // Save changes
+                    const updatedTitle = titleInput.value;
+                    const updatedDescription = descriptionInput.value;
+
+                    if (!updatedTitle.trim()) {
+                        alert('Title cannot be empty or whitespace only');
+                        return;
+                    }
+                    if (!updatedDescription.trim()) {
+                        alert('Description cannot be empty or whitespace only');
+                        return;
+                    }
+
+                    fetch(`/api/todos/${todo.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            title: updatedTitle,
+                            description: updatedDescription,
+                            completed: checkbox.checked,
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(updatedTodo => {
+                        todoText.innerText = `${updatedTodo.title} - ${updatedTodo.description}`;
+                        item.replaceChild(todoText, titleInput);
+                        item.removeChild(descriptionInput);
+                        editTodoButton.innerText = 'Edit';
+                        isEditing = false;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
             editTodoButton.style.display = 'none';
             editTodoButton.innerText = 'Edit';
             deleteButton.classList.add('action-button', 'delete-button');
@@ -161,11 +219,12 @@
 
             // Append the checkbox, todo title and description to the list item
             item.append(checkbox);
-            item.append(` ${todo.title} - ${todo.description ?? ''}`);
+            const todoText = document.createElement('span');
+            todoText.innerText = `${todo.title} - ${todo.description}`;
+            item.append(todoText);
             item.append(editTodoButton);
             item.append(deleteButton);
             list.append(item);
         }
     </script>
 {% endblock %}
-
